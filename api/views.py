@@ -24,14 +24,23 @@ def add_user():
     db.session.commit()
 
     return 'Done', 201
-
+# @app.route('your route', methods=['GET'])
+# def yourMethod(params):
+#     response = flask.jsonify({'some': 'data'})
+#     response.headers.add('Access-Control-Allow-Origin', '*')
+#     return response
 @main.route('/tickets')
 def tickets():
     tickets_list = Ticket.query.all()
     tickets = []
-# Ticket(user_id=ticket_data['user_id'], title=ticket_data['title'], body=ticket_data['body'], assigned_to=ticket_data['assigned_to'], completed=ticket_data['completed'],timestamp=ticket_data['timestamp'])
 
     for ticket in tickets_list:
         tickets.append({'user_id': ticket.user_id, 'title': ticket.title, 'body': ticket.body, 'assigned_to': ticket.assigned_to, 'completed': ticket.completed, 'timestamp': ticket.timestamp })
 
     return jsonify({'tickets': tickets})
+
+@main.route('/ticket/<id>')
+def ticket(id):
+    ticket = Ticket.query.filter_by(id=id).first()
+    data = {"user_id": ticket.user_id, "title": ticket.title, "body": ticket.body, "assigned_to": ticket.assigned_to, "completed": ticket.completed, "timestamp": ticket.timestamp}
+    return jsonify(data)
