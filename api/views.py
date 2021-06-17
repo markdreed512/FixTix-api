@@ -1,8 +1,18 @@
 from flask import Blueprint, jsonify, request
 from . import db
-from .models import Ticket, User
+from .models import Ticket, User, Project
 
 main = Blueprint('main', __name__)
+
+@main.route('/add_project', methods=['POST'])
+def add_project():
+    project_data = request.get_json()
+    new_project = Project(title=project_data['title'], description=project_data['description'],timestamp=project_data['timestamp'])
+
+    db.session.add(new_project)
+    db.session.commit()
+
+    return 'Done', 201
 
 @main.route('/add_ticket', methods=['POST'])
 def add_ticket():
