@@ -4,9 +4,11 @@ from . import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(20), unique=True, nullable=False)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     image_file = db.Column(db.String(240))
+    role = db.Column(db.String(240), nullable=False)
     tickets = db.relationship('Ticket', backref='author', lazy=True)
     
     def __repr__(self):
@@ -20,7 +22,7 @@ class Project(db.Model):
 
     def __repr__(self):
         return f"Project( '{self.id}', '{self.title}'"
-        
+
 class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
