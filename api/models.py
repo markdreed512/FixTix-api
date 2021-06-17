@@ -29,8 +29,10 @@ class Ticket(db.Model):
     title = db.Column(db.String(240), nullable=False)
     body = db.Column(db.Text())
     assigned_to = db.Column(db.String(240))
-    completed = db.Column(db.Boolean, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    high_priority = db.Column(db.Boolean)
+    comments = db.Column(db.Text())
+    status = db.Column(db.String(240), nullable=False)
 
-    def __repr__(self):
-        return f"Ticket( '{self.id}', '{self.title}', '{self.assigned_to}', '{self.completed}')"
+    # def __repr__(self):
+    #     return f"Ticket( '{self.id}', '{self.title}', '{self.assigned_to}'}')"
