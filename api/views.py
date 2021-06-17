@@ -7,7 +7,7 @@ main = Blueprint('main', __name__)
 @main.route('/add_ticket', methods=['POST'])
 def add_ticket():
     ticket_data = request.get_json()
-
+    print(ticket_data)
     new_ticket = Ticket(user_id=ticket_data['user_id'], title=ticket_data['title'], body=ticket_data['body'], assigned_to=ticket_data['assigned_to'], completed=ticket_data['completed'],timestamp=ticket_data['timestamp'])
 
     db.session.add(new_ticket)
@@ -35,7 +35,7 @@ def tickets():
     tickets = []
 
     for ticket in tickets_list:
-        tickets.append({'user_id': ticket.user_id, 'title': ticket.title, 'body': ticket.body, 'assigned_to': ticket.assigned_to, 'completed': ticket.completed, 'timestamp': ticket.timestamp })
+        tickets.append({'id': ticket.id, 'user_id': ticket.user_id, 'title': ticket.title, 'body': ticket.body, 'assigned_to': ticket.assigned_to, 'completed': ticket.completed, 'timestamp': ticket.timestamp })
 
     return jsonify({'tickets': tickets})
 
