@@ -4,21 +4,24 @@ from .models import Ticket, User, Project
 import bcrypt
 main = Blueprint('main', __name__)
 
-@main.route('/login')
+@main.route('/login', methods=['POST'])
 def login():
     
     username = request.json.get('username')
+    print(username)
     password = request.json.get('password')
+    print(password)
+    
     if not username: 
         return "Missing username", 401
     if not password:
         return "Missing password", 401
 
     user = User.query.filter_by(username=username).first()
+    
     if not user:
         return "User not found", 404
     if bcrypt.checkpw(password.encode('utf-8'), user.password):
-        print("here")
         return "Welcome back " + username + "!!", 200
     else:
         return "Wrong Password!!", 401
@@ -84,3 +87,11 @@ def ticket(id):
     ticket = Ticket.query.filter_by(id=id).first()
     data = {"user_id": ticket.user_id, "title": ticket.title, "body": ticket.body, "assigned_to": ticket.assigned_to, "status": ticket.status, "timestamp": ticket.timestamp, "comments": ticket.comments}
     return jsonify(data)
+
+@main.route('/delete_ticket/<id>')
+def delete_ticket(id):
+    print(id)
+    ticket = Ticket.query.filter_by(id=id).first()
+    db.session.delete(ticket)
+    db.session.commit()
+    return jsonify({"response": "ticket deleted"}), 200
