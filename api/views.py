@@ -49,10 +49,13 @@ def add_ticket():
 
 @main.route('/add_user', methods=['POST'])
 def add_user():
-    email = request.json.get('email', None)
+    print("top of add_user")
+    print(request)
+    email = request.json.get('email')
+    print(email)
     username = request.json.get('username', None)
-    password = request.json.get('password', None)
-    image_file = request.json.get('image_file', None)
+    password = request.json.get('password1', None)
+    # image_file = request.json.get('image_file', None)
     role = "user"
 
     if not email:
@@ -64,7 +67,7 @@ def add_user():
 
     hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    new_user = User(email=email, password=hashed_pw, username=username, image_file=image_file, role=role)
+    new_user = User(email=email, password=hashed_pw, username=username, role=role)
 
     db.session.add(new_user)
     db.session.commit()
@@ -82,6 +85,24 @@ def tickets():
 
     return jsonify({'tickets': tickets})
 
+@main.route('/users')
+def users():
+    users_list = User.query.all()
+    print(users_list)
+    users = []
+
+    for user in users_list:
+        users.append({'username': user.username })
+    print(users)
+    return jsonify({'users': users})
+
+@main.route('/user/<id>')
+def user(id):
+    user = User.query.filter_by(id=id).first()
+    print(user)
+    data = {"username": user.username}
+    return jsonify(data)
+
 @main.route('/ticket/<id>')
 def ticket(id):
     ticket = Ticket.query.filter_by(id=id).first()
@@ -90,8 +111,17 @@ def ticket(id):
 
 @main.route('/delete_ticket/<id>')
 def delete_ticket(id):
-    print(id)
     ticket = Ticket.query.filter_by(id=id).first()
     db.session.delete(ticket)
     db.session.commit()
     return jsonify({"response": "ticket deleted"}), 200
+
+@main.route('/close_ticket/<id>', methods=['PUT'])
+def close_ticket(id):
+    ticket = Ticket.query.filter_by(id=id).first()
+    print(ticket.status)
+    # db.session.delete(ticket)
+    ticket.status = "closed"
+    db.session.commit()
+
+    return jsonify({Ticket.status: "ticket closed"}), 200
