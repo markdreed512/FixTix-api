@@ -8,9 +8,7 @@ main = Blueprint('main', __name__)
 def login():
     
     username = request.json.get('username')
-    print(username)
     password = request.json.get('password')
-    print(password)
     
     if not username: 
         return "Missing username", 401
@@ -39,20 +37,16 @@ def add_project():
 @main.route('/add_ticket', methods=['POST'])
 def add_ticket():
     ticket_data = request.get_json()
-    print(ticket_data)
     new_ticket = Ticket(user_id=ticket_data['user_id'], title=ticket_data['title'], body=ticket_data['body'], assigned_to=ticket_data['assigned_to'], status=ticket_data['status'], comments=ticket_data['comments'], high_priority=ticket_data['high_priority'], timestamp=ticket_data['timestamp'])
 
     db.session.add(new_ticket)
     db.session.commit()
 
-    return 'Done', 201
+    return 'Ticket Added', 201
 
 @main.route('/add_user', methods=['POST'])
 def add_user():
-    print("top of add_user")
-    print(request)
     email = request.json.get('email')
-    print(email)
     username = request.json.get('username', None)
     password = request.json.get('password1', None)
     # image_file = request.json.get('image_file', None)
@@ -88,25 +82,22 @@ def tickets():
 @main.route('/users')
 def users():
     users_list = User.query.all()
-    print(users_list)
     users = []
 
     for user in users_list:
         users.append({'username': user.username })
-    print(users)
     return jsonify({'users': users})
 
 @main.route('/user/<id>')
 def user(id):
     user = User.query.filter_by(id=id).first()
-    print(user)
     data = {"username": user.username}
     return jsonify(data)
 
 @main.route('/ticket/<id>')
 def ticket(id):
     ticket = Ticket.query.filter_by(id=id).first()
-    data = {"user_id": ticket.user_id, "title": ticket.title, "body": ticket.body, "assigned_to": ticket.assigned_to, "status": ticket.status, "timestamp": ticket.timestamp, "comments": ticket.comments}
+    data = {"id": ticket.id, "user_id": ticket.user_id, "title": ticket.title, "description": ticket.body, "assigned_to": ticket.assigned_to, "status": ticket.status, "timestamp": ticket.timestamp, "comments": ticket.comments, "high_priority": ticket.high_priority}
     return jsonify(data)
 
 @main.route('/delete_ticket/<id>')
@@ -119,9 +110,22 @@ def delete_ticket(id):
 @main.route('/close_ticket/<id>', methods=['PUT'])
 def close_ticket(id):
     ticket = Ticket.query.filter_by(id=id).first()
-    print(ticket.status)
-    # db.session.delete(ticket)
     ticket.status = "closed"
     db.session.commit()
 
     return jsonify({Ticket.status: "ticket closed"}), 200
+
+@main.route('/edit_ticket/<id>', methods=['GET', 'PUT'])
+def edit_ticket(id):
+    ticket = Ticket.query.filter_by(id=id).first()
+    request_data = request.get_json()
+    print("request body: ") 
+    print(request_data)
+    ticket.title = request_data['title']
+    ticket.body = request_data['body']
+    ticket.assigned_to = request_data['assigned_to']
+    ticket.high_priority = request_data['high_priority']
+    ticket.comments = request_data['comments']
+    db.session.commit()
+
+    return "done."
