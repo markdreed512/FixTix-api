@@ -20,7 +20,9 @@ def login():
     if not user:
         return "User not found", 404
     if bcrypt.checkpw(password.encode('utf-8'), user.password):
-        return "Welcome back " + username + "!!", 200
+        # should return user object here:
+        data = {"username": user.username, "id": user.id }
+        return jsonify(data)
     else:
         return "Wrong Password!!", 401
 
@@ -99,6 +101,19 @@ def ticket(id):
     ticket = Ticket.query.filter_by(id=id).first()
     data = {"id": ticket.id, "user_id": ticket.user_id, "title": ticket.title, "description": ticket.body, "assigned_to": ticket.assigned_to, "status": ticket.status, "timestamp": ticket.timestamp, "comments": ticket.comments, "high_priority": ticket.high_priority}
     return jsonify(data)
+
+@main.route('/tickets/<id>')
+def mytickets(id):
+    print("Yoo...hO000....")
+    tickets = Ticket.query.filter_by(user_id=id).all()
+    print(tickets)
+    # iterate over tickets, pull out each property, stick it into an obj, and push obj to array
+    ticket_list = []
+    for ticket in tickets:
+        data = {"id": ticket.id, "user_id": ticket.user_id, "title": ticket.title, "description": ticket.body, "assigned_to": ticket.assigned_to, "status": ticket.status, "timestamp": ticket.timestamp, "comments": ticket.comments, "high_priority": ticket.high_priority}
+        ticket_list.append(data)
+        
+    return jsonify(ticket_list)
 
 @main.route('/delete_ticket/<id>')
 def delete_ticket(id):
