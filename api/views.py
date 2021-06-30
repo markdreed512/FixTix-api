@@ -81,6 +81,16 @@ def tickets():
 
     return jsonify({'tickets': tickets})
 
+@main.route('/projects')
+def projects():
+    projects_list = Project.query.all()
+    projects = []
+
+    for project in projects_list:
+        projects.append({'title': project.title, 'description': project.description, 'timestamp': project.timestamp})
+
+    return jsonify(projects)
+
 @main.route('/users')
 def users():
     users_list = User.query.all()
@@ -112,7 +122,7 @@ def mytickets(id):
     for ticket in tickets:
         data = {"id": ticket.id, "user_id": ticket.user_id, "title": ticket.title, "description": ticket.body, "assigned_to": ticket.assigned_to, "status": ticket.status, "timestamp": ticket.timestamp, "comments": ticket.comments, "high_priority": ticket.high_priority}
         ticket_list.append(data)
-        
+
     return jsonify(ticket_list)
 
 @main.route('/delete_ticket/<id>')
